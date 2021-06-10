@@ -29,9 +29,8 @@ func (e *Errors) Add(message string) Errors {
 
 // AddE appends the provided error
 func (e *Errors) AddE(err error) Errors {
-	if err == nil {
-		return nil
+	if err != nil {
+		*e = append(*e, err)
 	}
-	*e = append(*e, err)
 	return *e
 }

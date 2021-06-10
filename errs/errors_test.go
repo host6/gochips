@@ -11,14 +11,7 @@ import (
 
 func TestErrors(t *testing.T) {
 	var errs Errors
-	println(cap(errs))
-	require.Nil(t, errs)
-
 	perr := &errs
-
-	var newErr error
-	errs.AddE(newErr)
-	require.Nil(t, errs)
 
 	errs.Add("error1")
 	fmt.Printf("%p\n", perr)
@@ -39,7 +32,7 @@ func TestErrors(t *testing.T) {
 	require.Equal(t, "Multiple errors:\nerror1\nerror2\nerror3\nerror4", perr.Error())
 	require.Equal(t, "error4", Errors(*perr)[3].Error())
 
-	errs = errs.Add("error5")
+	errs.Add("error5")
 	require.Equal(t, "Multiple errors:\nerror1\nerror2\nerror3\nerror4\nerror5", perr.Error())
 
 	errsAsError := error(perr)
@@ -51,4 +44,21 @@ func TestErrors(t *testing.T) {
 	fmt.Printf("%p\n", perr)
 	require.Equal(t, 1205, len(*perr))
 	require.Equal(t, "test1199", Errors(*perr)[1204].Error())
+}
+
+func TestErrorsAddNil(t *testing.T) {
+	var errs Errors
+	require.Nil(t, errs)
+
+	var newErr error
+	errs.AddE(newErr)
+	require.Nil(t, errs)
+
+	errs.AddE(nil)
+	require.Nil(t, errs)
+
+	errs.AddE(errors.New("1"))
+	errs.AddE(nil)
+	errs.AddE(errors.New("2"))
+	require.Equal(t, "Multiple errors:\n1\n2", errs.Error())
 }
